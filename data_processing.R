@@ -65,9 +65,6 @@ proj4string(apis_data_sp) <- CRS("+proj=longlat +datum=WGS84")
 bc_crs <- "+proj=aea +lat_0=45 +lon_0=-126 +lat_1=50 +lat_2=58.5 +x_0=1000000 +y_0=0 +datum=NAD83 +units=m +no_defs"
 apis_data_transformed <- spTransform(apis_data_sp, CRS(bc_crs))
 
-# extract the transformed coordinates
-apis_data_clean_transformed <- data.frame(coordinates(apis_data_transformed))
-
 # extract the transformed coordinates and assign them to the original cleaned df
 apis_data_clean$decimalLongitude <- apis_data_transformed@coords[, 1]
 apis_data_clean$decimalLatitude <- apis_data_transformed@coords[, 2]
