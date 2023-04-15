@@ -1,0 +1,165 @@
+---
+title: "Project_V1"
+author: "Vimaljeet Singh"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, cache=TRUE, warning=FALSE)
+library(spatstat)
+library(sp)
+library(sf)
+library(maptools)
+library(rgdal)
+library(rgbif)
+library(spatstat.explore)
+spatstat.messages=FALSE
+sp.messages=FALSE
+sf.messages=FALSE
+maptools.messages=FALSE
+rgbif.messages=FALSE
+rgdal.messages=FALSE
+options(spatstat=FALSE,crs.messages=FALSE)
+```
+
+
+```{r cache=TRUE}
+source("C:/Users/vjsng/Data589/Spatial-Analysis-Honey-Bees/data_processing.R")
+```
+
+```{r}
+plot(apis_data_ppp)
+```
+
+## Number of data points 
+
+```{r}
+# number of points
+
+npoints(apis_data_ppp)
+```
+
+## Intensity
+
+(Assuming it is homogeneous)
+
+```{r cache=T}
+# intensity
+
+intensity(apis_data_ppp)
+```
+
+## Quadrat counting
+
+```{r cache=T}
+# quadrat counting (4x2 quadrat)
+
+myquadrat = quadratcount(apis_data_ppp, nx = 4, ny = 2)
+plot(apis_data_ppp, pch = 16, use.marks=F, cols = "#046C9A")
+plot(myquadrat, cex=2, col="red", add=T)
+```
+
+## Intensity in each quadrat
+
+```{r cache=T}
+# estimating intensity in each quadrat
+
+intensity(myquadrat)
+
+# plot quadrat intensity
+
+plot(intensity(myquadrat, image=T))
+```
+
+## Test of homogeneity
+
+```{r cache=T}
+# test of homogeneity
+
+quadrat.test(myquadrat)
+```
+
+The p-value < 2.2e-16 indicates that the observed pattern of points is significantly non-random with very strong evidence against the null hypothesis of complete spatial randomness (CSR) at any significance level. Hence, point pattern is not homogeneous.
+
+## Kernel Estimation
+
+```{r cache=T}
+# kernel estimation
+
+lambda_u_hat = density(apis_data_ppp)
+plot(lambda_u_hat, main="Inhomogeneous Intensity")
+plot(apis_data_ppp, pch=16, cex=0.2, add=T, use.marks=F, cols="green")
+```
+
+Results vary from quadrat estimation in some sense, the central region has very less intensity as was being shown in quadrat plot, but actually using the plot above, we can see that the central region has actually very less intensity. Most amount of intensity is in the south.
+
+## Hot spot analysis
+
+Even though we can see from the plot above that the intensity is inhomogeneous and higher in the south, we would still like to identify areas where the intensity is elevated. This is what we will do below using scan test.
+
+At each location u, we can draw a circle of radius r (we call this my_R in the code below) . Under an assumption that the process is Poisson distributed, we can calculate a likelihood ratio test statistics for the number of points inside vs. outside of the circle. The null distribution is $\chi^2$ with 1 degree of freedom (allowing us to calculate p-values)
+
+```{r cache=T}
+# hotspot analysis via scan test
+
+# estimate R
+my_R = bw.ppl(apis_data_ppp)
+
+# calculate test statistic
+my_lr = scanLRTS(apis_data_ppp, r= my_R)
+
+# plot the output
+# plot(my_lr, main="Likelihood Ratio")
+
+# compute pvalues
+pvals = eval.im(pchisq(my_lr, df=1, lower.tail=F))
+
+# plot output
+plot(pvals)
+```
+
+## Check relation with covariate
+
+(We probably need to divide it into better partitioning than 4x4)
+
+```{r cache=T, echo =F}
+# define quartiles of elevation (into 4 parts)
+# quarts = quantile(elevation, probs = (0:4)/4, type=2)
+# 
+# # split image into 4 equal - area quadrats based on elevation values
+# Zcut = cut(elevation, breaks=quarts)
+# V = tess(image=Zcut)
+# 
+# # quadratcount(apis_data_ppp, tess=V)
+# 
+# plot(quadratcount(apis_data_ppp, tess=V))
+# plot(apis_data_ppp, pch=16, cex=0.5, add=T, use.marks=F, cols="green")
+```
+
+## Relative distribution estimate
+
+Here we check for intensity's relationship with "elevation". To do this, we assume intensity is a function of elevation. The following plot gives us a non-parametric estimate of $\rho$ via kernel estimation. (Add interpretation of the plot)
+
+```{r cache=T}
+# estimate rho
+
+# rho = rhohat(apis_data_ppp, elevation)
+# plot((rho)) # cannot knit as it says input should be dataframe
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
