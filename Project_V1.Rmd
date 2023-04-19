@@ -42,7 +42,7 @@ npoints(apis_data_ppp)
 
 ## Intensity
 
-(Assuming it is homogeneous)
+Assuming intensity is homogeneous, we use the inbuilt function to find the value of intensity.
 
 ```{r cache=T}
 # intensity
@@ -50,27 +50,25 @@ npoints(apis_data_ppp)
 intensity(apis_data_ppp)
 ```
 
+
 ## Quadrat counting
+
+In most real scenarios, $\lambda$ is likely to be spatially varying. When $\lambda$ is spatially varying, the intensity at any location u is $\lambda(u)$ and it can be estimated non-parametrically by dividing the window into sub-regions called quadrats.
+
 
 ```{r cache=T}
 # quadrat counting (4x2 quadrat)
 
-myquadrat = quadratcount(apis_data_ppp, nx = 4, ny = 2)
-plot(apis_data_ppp, pch = 16, use.marks=F, cols = "#046C9A")
+myquadrat = quadratcount(apis_data_ppp, nx = 2, ny = 3)
+plot(apis_data_ppp, pch = 16, use.marks=F, cols = "#046C9A", main = "Intensity of Bees in BC")
 plot(myquadrat, cex=2, col="red", add=T)
+
+# plot intensity in each quadrat
+plot(intensity(myquadrat, image=T), main = "Inhomogeneous Intensity")
 ```
 
-## Intensity in each quadrat
+Clearly, the assumption of homogeneity is inappropriate for this dataset as the bees tend to be clustered in certain areas of the study site, whereas others have no bees at all. Quadrat counting suggests a spatially varying, inhomogeneous $\lambda(u)$ , but point processes are stochastic and some variation is expected by chance alone. Our eyes are also a poor judge of homogeneity, so we should ideally test for spatial (in)homogeneity objectively. Under a null hypothesis that the intensity is homogeneous, we carry out the test for significant deviations from complete spatial randomness.
 
-```{r cache=T}
-# estimating intensity in each quadrat
-
-intensity(myquadrat)
-
-# plot quadrat intensity
-
-plot(intensity(myquadrat, image=T))
-```
 
 ## Test of homogeneity
 
@@ -80,25 +78,35 @@ plot(intensity(myquadrat, image=T))
 quadrat.test(myquadrat)
 ```
 
-The p-value < 2.2e-16 indicates that the observed pattern of points is significantly non-random with very strong evidence against the null hypothesis of complete spatial randomness (CSR) at any significance level. Hence, point pattern is not homogeneous.
+The small p-value (< 2.2e-16) indicates that the observed pattern of points is significantly non-random with very strong evidence against the null hypothesis of complete spatial randomness (CSR) at any significance level. Hence, there is a significant deviation from homogeneity. The p-value doesn’t provide any information on the cause of inhomogeneity, however, and significant deviations can be due to the processes truly being inhomogeneous, but also due to a lack of independence between points.
 
 ## Kernel Estimation
+
+A spatially varying, λ(u) can also be estimated non-parametrically by kernel estimation.
 
 ```{r cache=T}
 # kernel estimation
 
 lambda_u_hat = density(apis_data_ppp)
-plot(lambda_u_hat, main="Inhomogeneous Intensity")
-plot(apis_data_ppp, pch=16, cex=0.2, add=T, use.marks=F, cols="green")
+plot(lambda_u_hat, main="Kernel Estimation of Intensity")
+plot(apis_data_ppp, pch=16, cex=0.4, add=T, use.marks=F, cols="green")
 ```
 
-Results vary from quadrat estimation in some sense, the central region has very less intensity as was being shown in quadrat plot, but actually using the plot above, we can see that the central region has actually very less intensity. Most amount of intensity is in the south.
+```{r}
+# using different bandwidth optimiser
+
+plot(density(apis_data_ppp, sigma = bw.ppl),  # Likelihood Cross Validation Bandwidth Selection
+     ribbon = T,
+     main = "")
+```
+
+Using the plots above, we can see that south BC has high intensity and there is mostly no change in the northern and central BC area. This is consistent with the findings of the quadrat count graph as well.
 
 ## Hot spot analysis
 
 Even though we can see from the plot above that the intensity is inhomogeneous and higher in the south, we would still like to identify areas where the intensity is elevated. This is what we will do below using scan test.
 
-At each location u, we can draw a circle of radius r (we call this my_R in the code below) . Under an assumption that the process is Poisson distributed, we can calculate a likelihood ratio test statistics for the number of points inside vs. outside of the circle. The null distribution is $\chi^2$ with 1 degree of freedom (allowing us to calculate p-values)
+As the intensity is inhomogeneous, at each location u, we can draw a circle of radius r (we call this my_R in the code below) and then count the number of points in and out of the circle. This r has been found through kernel bandwidth optimization. Also, under an assumption that the process is Poisson distributed, we can calculate a likelihood ratio test statistics for the number of points inside vs. outside of the circle. The null distribution is $\chi^2$ with 1 degree of freedom allowing us to calculate p-values at each location u.
 
 ```{r cache=T}
 # hotspot analysis via scan test
@@ -110,51 +118,81 @@ my_R = bw.ppl(apis_data_ppp)
 my_lr = scanLRTS(apis_data_ppp, r= my_R)
 
 # plot the output
-# plot(my_lr, main="Likelihood Ratio")
+plot(my_lr, main="Likelihood Ratio")
+plot(BC_win, add=T)
 
 # compute pvalues
 pvals = eval.im(pchisq(my_lr, df=1, lower.tail=F))
 
 # plot output
-plot(pvals)
+plot(pvals, main = "Local p-values")
+plot(BC_win, add=T)
 ```
 
-## Check relation with covariate
+From the p-value plot, we can see that the hot spot areas are more densely situated towards the south of BC.
 
-(We probably need to divide it into better partitioning than 4x4)
-
-```{r cache=T, echo =F}
-# define quartiles of elevation (into 4 parts)
-# quarts = quantile(elevation, probs = (0:4)/4, type=2)
-# 
-# # split image into 4 equal - area quadrats based on elevation values
-# Zcut = cut(elevation, breaks=quarts)
-# V = tess(image=Zcut)
-# 
-# # quadratcount(apis_data_ppp, tess=V)
-# 
-# plot(quadratcount(apis_data_ppp, tess=V))
-# plot(apis_data_ppp, pch=16, cex=0.5, add=T, use.marks=F, cols="green")
-```
-
-## Relative distribution estimate
-
-Here we check for intensity's relationship with "elevation". To do this, we assume intensity is a function of elevation. The following plot gives us a non-parametric estimate of $\rho$ via kernel estimation. (Add interpretation of the plot)
+## Check relation with covariate (Elevation)
 
 ```{r cache=T}
 # estimate rho
-
+# 
 # rho = rhohat(apis_data_ppp, elevation)
-# plot((rho)) # cannot knit as it says input should be dataframe
+# plot(rho, main="Rho vs Elevation")
 ```
 
+Double check this entire interpretation:
+
+The intensity seems to have a non-linear relation with elevation at lower values only (till about 200m). 
+
+## Using Ripley's $K$-function to test for a significant (i.e., $\alpha$ = 0.05) correlation between locations
+
+```{r cache=T}
+#Estimate a strictly positive density
+lambda <- density(apis_data_ppp, sigma=bw.ppl, positive=TRUE)
+
+inhom <- envelope(apis_data_ppp,
+                  Kinhom,
+                  simulate = expression(rpoispp(lambda)),
+                  correction="border",
+                  rank = 1,
+                  nsim = 19, # for alpha = 0.05
+                  fix.n = TRUE)
+
+# visualise the results
+# par(mfrow=c(1,2))
+plot(inhom, main = "", lwd = 2, xlim=c(0, 300000))
+```
+Double check this entire interpretation:
+Doubt: There is significant evidence of clustering at lower elevations  (till about 25000 metres as seen from the plot). ??
+
+The shading is centered around the estimated K-function and the width of the shaded region reflects the precision of the estimate. The confidence band is around the observed values mostly for the entirety of the plot and the expected values denoted by the red line is inside the band too. Hence, there is no significant evidence of clustering among bees.
 
 
+## Estimating both the homogeneous and inhomogeneous pair correlation functions, using simulation envelopes. 
 
+```{r}
+## Simulation envelope (with points drawn from the estimated intensity)
 
+# homogeneous
+pcf_hom <- envelope(apis_data_ppp,
+                    pcf,
+                    simulate = expression(rpoispp(lambda)),
+                    rank = 1,
+                    nsim = 19)
 
+# inhomogeneous
+pcf_inhom <- envelope(apis_data_ppp,
+                      pcfinhom,
+                      simulate = expression(rpoispp(lambda)),
+                      rank = 1,
+                      nsim = 19)
 
+# visualise the results
+plot(pcf_hom, main="Homogeneous PCF", lwd=2)
+plot(pcf_inhom, main="Inhomogeneous PCF", lwd=2)
+```
 
+g(r) is the probability of observing a pair of points of the process separated by a distance r, divided by the corresponding probability for a Poisson process. Pair correlations function contains contributions only from inter-point distances equal to r (and not <= r). We will use the inhomogeneous pair correlation function as our point process is inhomogeneous. As g(r)> 1 indicates that this inter-point distance is more frequent than expected for a completely random pattern, which suggests clustering, we can say that there is significant evidence of clustering at lower values of r for our point process.
 
 
 
