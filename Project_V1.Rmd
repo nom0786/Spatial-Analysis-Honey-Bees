@@ -102,7 +102,7 @@ plot(density(apis_data_ppp, sigma = bw.ppl),  # Likelihood Cross Validation Band
 
 Using the plots above, we can see that south BC has high intensity and there is mostly no change in the northern and central BC area. This is consistent with the findings of the quadrat count graph as well.
 
-## Hot spot analysis
+## Hotspot analysis
 
 Even though we can see from the plot above that the intensity is inhomogeneous and higher in the south, we would still like to identify areas where the intensity is elevated. This is what we will do below using scan test.
 
@@ -135,14 +135,22 @@ From the p-value plot, we can see that the hot spot areas are more densely situa
 
 ```{r cache=T}
 # estimate rho
-# 
-# rho = rhohat(apis_data_ppp, elevation)
-# plot(rho, main="Rho vs Elevation")
+rho_e = rhohat(apis_data_ppp, DATA$Elevation)
+rho_f = rhohat(apis_data_ppp, DATA$Forest)
+rho_h = rhohat(apis_data_ppp, DATA$HFI)
+rho_d = rhohat(apis_data_ppp, DATA$Dist_Water)
 ```
 
-Double check this entire interpretation:
+```{r}
+# plot rhos for different covariates side-by-side
+par(mfrow=c(2,2))
+plot(rho_e, main="Rho vs Elevation")
+plot(rho_f, main="Rho vs Forest")
+plot(rho_h, main="Rho vs HFI")
+plot(rho_d, main="Rho vs Distance from Water")
+```
 
-The intensity seems to have a non-linear relation with elevation at lower values only (till about 200m). 
+The intensity seems to have a non-linear relation with elevation, forest, Human Footprint Index and Distance from Water.
 
 ## Using Ripley's $K$-function to test for a significant (i.e., $\alpha$ = 0.05) correlation between locations
 
@@ -194,10 +202,32 @@ plot(pcf_inhom, main="Inhomogeneous PCF", lwd=2)
 
 g(r) is the probability of observing a pair of points of the process separated by a distance r, divided by the corresponding probability for a Poisson process. Pair correlations function contains contributions only from inter-point distances equal to r (and not <= r). We will use the inhomogeneous pair correlation function as our point process is inhomogeneous. As g(r)> 1 indicates that this inter-point distance is more frequent than expected for a completely random pattern, which suggests clustering, we can say that there is significant evidence of clustering at lower values of r for our point process.
 
+## Checking for collinearity
 
+```{r}
+# printing the number of NA values in each covariate
+sum(is.na(DATA$Elevation$v))
+sum(is.na(DATA$Forest$v))
+sum(is.na(DATA$HFI$v))
+sum(is.na(DATA$Dist_Water$v))
 
+cor.im(DATA$Elevation$v, use="pairwise.complete.obs")
+```
 
+As most of the covariate data has NAs, we cannot check the collinearity among the covariates.
 
+## Model Fitting
+
+```{r}
+#Fit the PPP model
+
+elevation = DATA$Elevation
+forest = DATA$Forest
+hfi = DATA$HFI
+distwater = DATA$Dist_Water
+
+fit <- ppm(apis_data_clean ~ elevation + I(elevation^2) + forest + I(forest^2), data = apis_data_clean)
+```
 
 
 
