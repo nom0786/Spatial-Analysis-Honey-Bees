@@ -20,22 +20,36 @@ knitr::opts_chunk$set(cache=TRUE,
                       fig.align='center')
 ```
 
-## Introduction
+# Introduction - Noman
 
 Provide a brief description of the study system from which the data come and an outline of what questions you intend on exploring with the data, citing any relevant literature. Length: ca. 1 page.
 
-## Methods
+# Methods - All, see subsections
 
-Briefly describe the data and what variables are included. Provide a detailed description of the analytical workflow that was applied to the data, citing any relevant literature and statistical packages employed. There should be enough information that anyone can reproduce the workflow if they had access to the data. Length: As long as necessary.
+There should be enough information that anyone can reproduce the workflow if they had access to the data. Length: As long as necessary.
 
-## Results
+## Data collection and Description - Noman
+Briefly describe the data and what variables are included.
 
+## Exploratory Analysis - Vimal
+
+Provide a detailed description of the analytical workflow that was applied to the data, citing any relevant literature and statistical packages employed. 
+
+## Model Selection - Alyssa
+
+Provide a detailed description of the analytical workflow that was applied to the data, citing any relevant literature and statistical packages employed. 
+
+# Results
+## Exploratory Analysis - Vimal
 Describe your statistical findings. Tables and figures should be used throughout. Length: As long as necessary.
 
-## Discussion
+## Model Selection - Alyssa
+Describe your statistical findings. Tables and figures should be used throughout. Length: As long as necessary.
+
+# Discussion - Vimal and Alyssa
 
 Provide a brief summary of your findings. Length: ca. 1 page.
 
-## References
+# References - All
 
 Include references to all necessary literature.
