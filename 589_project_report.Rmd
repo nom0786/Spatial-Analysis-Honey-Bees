@@ -1,7 +1,7 @@
 ---
 title: "Honey Bees (Apis mellifera Linnaeus) Spatial Analysis"
 author: "Alyssa Foote, Noman Mohammad, and Vimaljeet Singh"
-date: "`r format(Sys.time(), '%d %B, %Y %H:%M:%OS')`"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
 output:
   bookdown::pdf_document2:
     toc: false
