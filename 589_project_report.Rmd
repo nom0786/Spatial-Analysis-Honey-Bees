@@ -79,6 +79,24 @@ The spatstats package, additionally has numerous functions that allow for easy p
 
 ## Exploratory Analysis - Vimal
 
+```{r cache=T, warnings=F, messages=F}
+bdata <- read.csv('data/apis_data_clean.csv')
+load('data/BC_Covariates.Rda') 
+
+elev <- DATA$Elevation
+forest <- DATA$Forest
+hfi <- DATA$HFI
+dist_water <- DATA$Dist_Water
+
+#setup window and ppp
+BC_win <- DATA$Window
+BC_win <- as.owin(DATA$Window)
+
+apis_data_ppp <- ppp(x = bdata$decimalLongitude, # X coordinates
+                y = bdata$decimalLatitude, # Y coordinates
+                window = BC_win)
+```
+
 ### Number of data points 
 
 ```{r}
