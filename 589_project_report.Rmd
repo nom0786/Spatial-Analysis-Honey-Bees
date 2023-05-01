@@ -22,6 +22,20 @@ knitr::opts_chunk$set(cache=TRUE,
                       fig.align='center',
                       fig.pos = "H", 
                       out.extra = "")
+library(spatstat)
+library(sp)
+library(sf)
+library(maptools)
+library(rgdal)
+library(rgbif)
+library(spatstat.explore)
+spatstat.messages=FALSE
+sp.messages=FALSE
+sf.messages=FALSE
+maptools.messages=FALSE
+rgbif.messages=FALSE
+rgdal.messages=FALSE
+options(spatstat=FALSE,crs.messages=FALSE)
 ```
 
 # Introduction
@@ -56,7 +70,7 @@ In addition to the occurrence data, covariate data for the province of British C
 
 ## Exploratory Analysis - Vimal
 
-Provide a detailed description of the analytical workflow that was applied to the data, citing any relevant literature and statistical packages employed.
+The spatstats package has multiple functions to help us do exploratory data analysis. We will start with finding the number of points using the function npoints(). We then find the intensity both homogeneous and inhomogeneous using the functions intensity() and quadratcount() respectively. We then do a test of homogeneity to check if the intensity is homogeneous or not using quadrat.test(). After determining that the intensity is homogeneous, we estimate it using kernel density estimation as well with the function density(). We then move on to find the areas of high intensity with hotspot analysis where we do a scan test and plot the pvalues to see where the areas of high intensity are. Next we check the relation of intensity with covariate using rhohat() function and check for any evidence of clustering using the inhomogeneous K-function and confirm the findings of K-function using pair correlation function pcf_inhom(). We use the plot from rhohat() which shows the relation between intensity and covariates to specify the initial model and perform model selection and validation. 
 
 ## Model Development
 
