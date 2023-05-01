@@ -1,7 +1,7 @@
 ---
 title: "Honey Bees (Apis mellifera Linnaeus) Spatial Analysis"
 author: "Alyssa Foote, Noman Mohammad, and Vimaljeet Singh"
-date: "r format(Sys.time(), '%d %B, %Y')"
+date: "`r format(Sys.time(), '%d %B, %Y %H:%M:%OS')`"
 output:
   bookdown::pdf_document2:
     toc: false
@@ -330,7 +330,9 @@ knitr::include_graphics("images/coll_matrix.png")
 lin_AIC <- AIC(lin_mod)
 quad1_AIC <- AIC(quad_mod1)
 ```
+
 Based on the results describe in the Exploratory section, the first model taken into consideration was a full quadratic model. This was because of the evidence that the relationship between honey bee intensity and the covariates was at least not linear. Further proven by comparing the AIC values - `r round(lin_AIC,4)` for the linear model versus `r round(quad1_AIC,4)` for the full quadratic model - and running a likelihood ratio test that rejected the linear model in favour of this full quadratic model, seen in Figure \@ref(fig:quad1lrt). However, based on the predicted intensity plot in Figure \@ref(fig:quad1pred), it is clear that this model is not very good. There are many areas of the province that are predicted to have high intensity even though there are few bees located there, which are represented by the black dots. The poor model fit is further exemplified in the quadrat test for deviance as seen in Figure \@ref(fig:quad1quadtest). The tiny p-value of 0.001 means that the suitability of this model for predicting the intensity of honey bees should be rejected. Additionally the model summary, in Figure \@ref(fig:quad1summ), indicates that only the quadratic term of the dist_water covariate is significant. 
+
 ```{r quad1lrt, echo=FALSE, warning=FALSE, message=FALSE, fig.cap="Likelihood Ratio Test - Full Quadratic Model"}
 knitr::include_graphics("images/LRT_quad1.png")
 ```
