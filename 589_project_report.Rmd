@@ -39,6 +39,7 @@ options(spatstat=FALSE,crs.messages=FALSE)
 ```
 
 # Introduction
+
 Spatial statistics have increasingly become an essential tool in understanding species distribution and habitat preferences, as well as in informing conservation and management decisions. In this report, we will analyze the occurrence data of the western honey bee (Apis mellifera Linnaeus) in the province of British Columbia (BC), Canada. 
 
 ![Apis mellifera](images/Apis_mellifera_image.jpeg) 
@@ -51,11 +52,8 @@ British Columbia (BC), a province within Canada, encompasses diverse ecosystems 
 
 In this study, we aim to explore the spatial distribution of honeybee populations (Apis mellifera) in British Columbia using occurrence data obtained from the Global Biodiversity Information Facility (GBIF) database. Our analysis will focus on describing the spatial distribution of Apis mellifera in the region, identifying any clustering or dispersion patterns in the occurrence data, and assessing the relationships between honeybee occurrence and various covariates, such as elevation, forest cover, Human Footprint Index (HFI), and distance to water sources. To achieve our objectives, we will construct a Poisson process model to analyze the spatial distribution of Apis mellifera occurrences in British Columbia. We will explore various statistical techniques, including creating rho plots, and examining the first and second moment statistics to gain insights into the clustering or dispersion patterns in the data. Furthermore, we will evaluate the relationship between honeybee occurrence and covariates such as elevation, forest cover, HFI, and distance to water sources, using spatial regression analysis. This will enable us to identify significant predictors that influence the spatial distribution of honeybee populations in the region. Additionally, we will explore collinearity between covariates, and use model validation techniques such as chi-squared tests and AIC scores. Overall, our approach will involve a combination of statistical modeling and exploratory data analysis techniques to gain a deeper understanding of the factors that influence honeybee occurrence in British Columbia.
 
-# Methods - All, see subsections
-
-There should be enough information that anyone can reproduce the workflow if they had access to the data. Length: As long as necessary.
-
 ## Data collection and Description
+
 This dataset contains occurrence records of the honey bee species Apis mellifera Linnaeus in the province of British Columbia, Canada. The data was collected using the 'rgbif' package in R, which allows for the retrieval of biodiversity data from the Global Biodiversity Information Facility (GBIF) database. It is important to note that the dataset may be subject to potential biases due to the reliance on self-reporting by the individuals or institutions responsible for collecting the data. This means that the accuracy and completeness of the information provided may vary depending on the quality of the reporting.
 
 The first step involved querying the number of records available for Apis mellifera Linnaeus in British Columbia. The complete dataset was then downloaded by specifying the scientific name, coordinates, country, and stateProvince parameters. After obtaining the data, it was saved as a CSV file.
@@ -98,11 +96,9 @@ Assuming intensity is homogeneous, we use the in-built function to find the valu
 intensity(apis_data_ppp)
 ```
 
-
 ### Quadrat counting
 
 In most real scenarios, $\lambda$ is likely to be spatially varying. When $\lambda$ is spatially varying, the intensity at any location u is $\lambda(u)$ and it can be estimated non-parametrically by dividing the window into sub-regions called quadrats. Let us do quadrat counting to find the inhomogeneous intensity:
-
 
 ```{r cache=T}
 # quadrat counting (4x2 quadrat)
@@ -347,7 +343,9 @@ quad_mod2 <- ppm(bees_ppp ~ elev_scale + I(elev_scale^2) + forest
 quad1_AIC <- AIC(quad_mod1)
 quad2_AIC <- AIC(quad_mod2)
 ```
+
 Therefore, the next model examined was another quadratic model but without the insignificant 'dist_water' term. While all the predictors were seen as significant in this model, as seen in Figure \@ref(fig:quad2summ), the predicted intensity plot did not change, Figure \@ref(fig:quad2pred). This model was also only a small improvement in AIC from the full quadratic model, `r quad2_AIC` from `r quad1_AIC`. However, the likelihood ratio test, as seen in Figure \@ref(fig:quad2lrt), does not support the reduced complexity since the p-value of $0.7636 > 0.05$. Meaning that the full quadratic model cannot be rejected in favour of the quadratic model without the 'dist_water term'. Furthermore, both models had nearly identical diagnostic plots, seen in Figure \@ref(fig:quad2diag), that indicate both models do not predicate the y coordinates adequately. That is for all parts of the province, the sum of residuals on the y coordinate fall outside the acceptable confidence band indicated by the dotted line. For the x coordinate, only the western and eastern edges of the province had acceptable residuals. No further diagnostics for either of these models were reviewed as a result.
+
 ```{r quad2summ, echo=FALSE, warning=FALSE, message=FALSE, fig.cap="Partial Quadratic Model Summary"}
 knitr::include_graphics("images/summ_quad2.png")
 ```
@@ -377,7 +375,9 @@ gam_smooth <- ppm(bees_ppp ~ bs(elev_scale,6) + bs(forest, 12)
 quad2_AIC <- AIC(quad_mod2)
 gam_smooth_AIC <- AIC(gam_smooth)
 ```
+
 Thus, another type of model, such as a generalized additive model (GAM), seemed appropriate. The first GAM model trialed was a full model with 6 knots on the scaled elevation, 12 knots on the forest coverage, 5 knots on the scaled distance to water, and 6 knots on the HFI. As compared to the quadratic models, this more complex model was supported by the AIC comparison, `r gam_smooth_AIC` versus `r quad2_AIC`, and the likelihood ratio test, as seen in Figure \@ref(fig:gam1lrt). The tiny p-value means that the quadratic model can be rejected in favour of the current gam model. A review of the partial residuals plot in Figure \@ref(fig:gam1parres), shows that elevation, distance to water, forest coverage, and human footprint index are all well represented overall. However, as seen in a visualization of the predicted intensity, Figure \@ref(fig:gam1pred), there are still a lot of low populated areas that have been predicted to have high intensity. The test for deviation between predicted and observed gives evidence, with a p-value of 0.001, to reject the current game model, as seen in Figure \@ref(fig:gam1quadtest). The diagnostic plot, seen in Figure \@ref(fig:gam1diag), shows further evidence that while there was an improvement in the residuals when compared to the quadratic models, there was still room for improvement.
+
 ```{r gam1lrt, echo=FALSE, warning=FALSE, message=FALSE, fig.cap="Likelihood Ratio Test - GAM Model"}
 knitr::include_graphics("images/LRT_gam1.png")
 ```
@@ -411,6 +411,7 @@ gam_xy_smooth <- ppm(bees_ppp ~ bs(elev_scale,6) + bs(forest, 12)
 gam_smooth_AIC <- AIC(gam_smooth)
 gam_xy_smooth_AIC <- AIC(gam_xy_smooth)
 ```
+
 Since no other covariates were available for consideration, the last gam model was built with the same covariates as the previous model with the addition of the x and y coordinates as proxy covariates. These new predictors had 6 knots on the x coordinate and 7 knots on the y coordinate. When compared to the previous gam model, this new model did better with an AIC of `r gam_xy_smooth_AIC`, as compared to `r gam_smooth_AIC`, and is supported as per the small p-value of $< 2.2e^{-16}$ seen in the likelihood ratio results in Figure \@ref(fig:gam2lrt). The partial residuals plot, in Figure \@ref(fig:gam2parres), also indicate that all variables are better represented. Although this model should be rejected as per the quadrat test results seen in Figure \@ref(fig:gam2quadtest), the resulting p-value of 0.039 is the highest of the 4 models reviewed. Meaning that the deviation between the predicted and observed values was the lowest in this model. Visually, there are some further improvements in the predicted intensity plot, as seen in Figure \@ref(fig:gam2pred). However, there are still low observation areas that are predicted to have low intensity. This is likely due to the significant amount of residuals in the lower parts of the province as seen in the diagnostics plot in Figure \@ref(fig:gam2diag).
 
 ```{r gam2lrt, echo=FALSE, warning=FALSE, message=FALSE, fig.cap="Likelihood Ratio Test - GAM Model with X-Y"}
