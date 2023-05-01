@@ -1,7 +1,7 @@
 ---
 title: "Honey Bees (Apis mellifera Linnaeus) Spatial Analysis"
 author: "Alyssa Foote, Noman Mohammad, and Vimaljeet Singh"
-date: 'r format(Sys.time(), '%d %B, %Y')'
+date: "r format(Sys.time(), '%d %B, %Y')"
 output:
   bookdown::pdf_document2:
     toc: false
@@ -43,7 +43,7 @@ options(spatstat=FALSE,crs.messages=FALSE)
 
 Spatial statistics have increasingly become an essential tool in understanding species distribution and habitat preferences, as well as in informing conservation and management decisions. In this report, we will analyze the occurrence data of the western honey bee (Apis mellifera Linnaeus) in the province of British Columbia (BC), Canada. 
 
-![Apis mellifera](images/Apis_mellifera_image.jpeg) 
+![A Western Honey Bee collecting nectar](images/Apis_mellifera_image.jpeg)
 
 The western honey bee, a critical pollinator species, plays a vital role in agriculture and ecosystem services. Understanding the distribution patterns and potential drivers of honey bee occurrence can provide valuable insights for the conservation of this species and the ecosystems they support.
 
@@ -79,7 +79,7 @@ The spatstats package, additionally has numerous functions that allow for easy p
 
 ## Exploratory Analysis - Vimal
 
-```{r cache=T, warnings=F, messages=F}
+```{r cache=T, warning=F, messages=F}
 bdata <- read.csv('data/apis_data_clean.csv')
 load('data/BC_Covariates.Rda') 
 
