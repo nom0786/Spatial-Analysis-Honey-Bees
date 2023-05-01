@@ -28,6 +28,7 @@ library(sf)
 library(maptools)
 library(rgdal)
 library(rgbif)
+library(splines)
 library(spatstat.explore)
 spatstat.messages=FALSE
 sp.messages=FALSE
@@ -247,12 +248,8 @@ plot(pcf_inhom, main="Inhomogeneous PCF", lwd=2)
 g(r) is the probability of observing a pair of points of the process separated by a distance r, divided by the corresponding probability for a Poisson process. Pair correlations function contains contributions only from inter-point distances equal to r (and not <= r). We will use the inhomogeneous pair correlation function as our point process is inhomogeneous. As g(r)> 1 indicates that this inter-point distance is more frequent than expected for a completely random pattern, we can say that there is significant evidence of clustering at very low values of r for our point process.
 
 ## Model Selection
-```{r echo=FALSE, warning=FALSE, message=FALSE, cache=TRUE}
-library(spatstat)
-library(maptools)
-library(sp)
-library(dplyr)
 
+```{r echo=FALSE, warning=FALSE, message=FALSE, cache=TRUE}
 bdata <- read.csv('data/apis_data_clean.csv')
 load('data/BC_Covariates.Rda') 
 
@@ -366,7 +363,7 @@ knitr::include_graphics("images/diag_quad2.png")
 #############################
 #gam model
 ############################
-library(splines)
+
 ### fit ppp model
 gam_smooth <- ppm(bees_ppp ~ bs(elev_scale,6) + bs(forest, 12) 
                   + bs(dist_water_scale,5) + bs(hfi, 6)
@@ -402,7 +399,6 @@ knitr::include_graphics("images/diag_gam1.png")
 ##################################
 #gam model with x-y coordinates
 #################################
-library(splines)
 gam_xy_smooth <- ppm(bees_ppp ~ bs(elev_scale,6) + bs(forest, 12) 
                   + bs(dist_water_scale,5) + bs(hfi, 6) + bs(x,6) + bs(y,7)
                   , data = DATA, use.gam = TRUE)
