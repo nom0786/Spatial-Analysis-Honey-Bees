@@ -39,11 +39,13 @@ rgdal.messages=FALSE
 options(spatstat=FALSE,crs.messages=FALSE)
 ```
 
+```{r echo=FALSE, warning=FALSE, message=FALSE, fig.cap="A Western Honey Bee collecting nectar"}
+knitr::include_graphics("images/Apis_mellifera_image.jpeg")
+```
+
 # Introduction
 
 Spatial statistics have increasingly become an essential tool in understanding species distribution and habitat preferences, as well as in informing conservation and management decisions. In this report, we will analyze the occurrence data of the western honey bee (Apis mellifera Linnaeus) in the province of British Columbia (BC), Canada. 
-
-![A Western Honey Bee collecting nectar](images/Apis_mellifera_image.jpeg)
 
 The western honey bee, a critical pollinator species, plays a vital role in agriculture and ecosystem services. Understanding the distribution patterns and potential drivers of honey bee occurrence can provide valuable insights for the conservation of this species and the ecosystems they support.
 
@@ -67,7 +69,7 @@ Finally, the cleaned and transformed data was saved as a new CSV file.
 
 In addition to the occurrence data, covariate data for the province of British Columbia is available. The covariate dataset includes variables such as Elevation, Forest, HFI (Human Footprint Index), and Dist_water (Distance to water). These variables provide information about the environmental conditions of each occurrence site, which can be useful for understanding the factors influencing the distribution and abundance of Apis mellifera Linnaeus in the province.
 
-## Exploratory Analysis - Vimal
+## Exploratory Analysis
 
 The spatstats package has multiple functions to help us do exploratory data analysis. We will start with finding the number of points using the function npoints(). We then find the intensity both homogeneous and inhomogeneous using the functions intensity() and quadratcount() respectively. We then do a test of homogeneity to check if the intensity is homogeneous or not using quadrat.test(). After determining that the intensity is homogeneous, we estimate it using kernel density estimation as well with the function density(). We then move on to find the areas of high intensity with hotspot analysis where we do a scan test and plot the pvalues to see where the areas of high intensity are. Next we check the relation of intensity with covariate using rhohat() function and check for any evidence of clustering using the inhomogeneous K-function and confirm the findings of K-function using pair correlation function pcf_inhom(). We use the plot from rhohat() which shows the relation between intensity and covariates to specify the initial model and perform model selection and validation. 
 
@@ -77,7 +79,7 @@ The spatstats package, additionally has numerous functions that allow for easy p
 
 # Results
 
-## Exploratory Analysis - Vimal
+## Exploratory Analysis
 
 ```{r cache=T, warning=F, messages=F}
 bdata <- read.csv('data/apis_data_clean.csv')
@@ -450,9 +452,9 @@ knitr::include_graphics("images/pred_gam2.png")
 knitr::include_graphics("images/diag_gam2.png")
 ```
 
-# Discussion - Vimal and Alyssa
+# Discussion
 
-The number of data points in the dataset is 2614. Test of homogeneity was done to see if the intensity is homogeneous and the intensity was found to be inhomogeneous which was also checked using quadrat count and validated using kernel estimation. On plotting the Kernel estimation of intensity and overlaying the points on it, it was seen that the points are aggregated more towards the south region of BC which was also confirmed by the hotspot analysis. Next, we proceeded to check the relation of intensity with the different covariates and the were all observed to be non linearly related with intensity. This gave us a good starting point for initial model specification. Inhomogeneous K-function (Kinhom) was used to see if there is evidence of clustering. It was found that only at very low values of r (<10000 units) there was evidence of clustering. This finding was  confirmed by the inhomogeneous pair correlation function envelopes done with 19 iterations which equals a significance level of 0.05.
+The number of data points in the dataset is 2614. Test of homogeneity was done to see if the intensity is homogeneous and the intensity was found to be inhomogeneous which was also checked using quadrat count and validated using kernel estimation. On plotting the Kernel estimation of intensity and overlaying the points on it, it was seen that the points are aggregated more towards the south region of BC which was also confirmed by the hotspot analysis. Next, we proceeded to check the relation of intensity with the different covariates and the were all observed to be non linearly related with intensity. This gave us a good starting point for initial model specification. Inhomogeneous K-function (Kinhom) was used to see if there is evidence of clustering. It was found that only at very low values of r (<10000 units) there was evidence of clustering. This finding was  confirmed by the inhomogeneous pair correlation function envelopes done with 19 iterations which equals a significance level of 0.05. After reviewing the linear and quadratic models, as well as two different GAM models, it was found that the GAM model with x-y coordinates performed the best. Although there were still low-population areas predicted to have high intensity, this model had the lowest deviation between predicted and observed values, as evidenced by the quadrat test results. The addition of the x and y coordinates as proxy covariates, as well as the use of generalized additive models, were likely the factors that contributed to the overall improved performance of this model. In conclusion, after comparing four models, including linear, quadratic, and two different GAM models, it was found that the generalized additive model with x-y coordinates as proxy covariates performed the best. This model had the lowest deviation between predicted and observed values and was the most accurate in predicting honey bee intensity in British Columbia. However, there were still low-population areas predicted to have high intensity, indicating that further improvements can be made. Therefore, additional covariates are required to accurately estimate honey bee intensity in BC, and future studies should explore the inclusion of other factors to improve the model's performance.
 
 # References - All
 
